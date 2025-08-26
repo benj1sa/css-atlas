@@ -1,4 +1,4 @@
-# Test Sidebar - Modern Next.js Application
+# CSS Atlas Frontend
 
 A sophisticated Next.js application featuring a modern sidebar navigation system, authentication, and a beautiful UI built with the latest web technologies.
 
