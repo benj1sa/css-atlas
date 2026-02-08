@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireDeveloper } from "@/lib/supabase/server";
 import { DevTestClient } from "@/app/dev/dev-test-client";
 
@@ -19,6 +20,15 @@ export default async function DevPage() {
         <p className="text-muted-foreground mt-2 text-sm">
           Logged in as: {user?.email || "No user found"}
         </p>
+      </div>
+
+      <div className="flex flex-wrap gap-4">
+        <Link
+          href="/dev/session-logs"
+          className="text-primary hover:underline text-sm font-medium"
+        >
+          Session Logs Test →
+        </Link>
       </div>
 
       <DevTestClient />
