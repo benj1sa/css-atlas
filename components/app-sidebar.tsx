@@ -28,12 +28,14 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
+const defaultUser = {
+  name: "User",
+  email: "",
+  avatar: "",
+};
+
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
+  user: defaultUser,
   navMain: [
     {
       title: "Playground",
@@ -152,7 +154,13 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  user: userProp,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
+  user?: { name: string; email: string; avatar: string };
+}) {
+  const user = userProp ?? data.user;
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -178,7 +186,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   )
