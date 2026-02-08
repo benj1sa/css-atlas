@@ -29,6 +29,12 @@ export default async function DevPage() {
         >
           Session Logs Test →
         </Link>
+        <Link
+          href="/dev/time"
+          className="text-primary hover:underline text-sm font-medium"
+        >
+          Campus Time Test →
+        </Link>
       </div>
 
       <DevTestClient />
