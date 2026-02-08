@@ -44,3 +44,12 @@ export {
 } from "./study-session-logs";
 
 export type { StudySessionLogRow } from "./study-session-logs";
+
+export {
+  fetchFrontDeskLogs,
+  getFrontDeskCleanedAndErrored,
+  getFrontDeskScholarsInRoom,
+  getFrontDeskCompletedSessions,
+} from "./front-desk-logs";
+
+export type { FrontDeskLogRow } from "./front-desk-logs";

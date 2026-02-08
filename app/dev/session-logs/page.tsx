@@ -3,10 +3,17 @@ import {
   getStudySessionCleanedAndErrored,
   getStudySessionScholarsInRoom,
   getStudySessionCompletedSessions,
+  getFrontDeskCleanedAndErrored,
+  getFrontDeskScholarsInRoom,
+  getFrontDeskCompletedSessions,
   SESSION_TYPE_STUDY,
   SESSION_TYPE_FRONT_DESK,
 } from "@/lib/session-logs";
-import type { ScholarInRoom, ScholarWithCompletedSession } from "@/lib/session-logs";
+import type {
+  ScholarInRoom,
+  ScholarWithCompletedSession,
+  CleanedAndErroredResult,
+} from "@/lib/session-logs";
 import {
   Card,
   CardContent,
@@ -42,18 +49,21 @@ function formatDate(iso: string): string {
 }
 
 export default async function SessionLogsTestPage() {
-  const [cleanedAll, cleanedStudy, cleanedFd, inRoomAll, inRoomStudy, inRoomFd, completedAll, completedStudy, completedFd] =
-    await Promise.all([
-      getStudySessionCleanedAndErrored(),
-      getStudySessionCleanedAndErrored({ sessionType: SESSION_TYPE_STUDY }),
-      getStudySessionCleanedAndErrored({ sessionType: SESSION_TYPE_FRONT_DESK }),
-      getStudySessionScholarsInRoom(),
-      getStudySessionScholarsInRoom({ sessionType: SESSION_TYPE_STUDY }),
-      getStudySessionScholarsInRoom({ sessionType: SESSION_TYPE_FRONT_DESK }),
-      getStudySessionCompletedSessions(),
-      getStudySessionCompletedSessions({ sessionType: SESSION_TYPE_STUDY }),
-      getStudySessionCompletedSessions({ sessionType: SESSION_TYPE_FRONT_DESK }),
-    ]);
+  const [
+    cleanedStudy,
+    cleanedFd,
+    inRoomStudy,
+    inRoomFd,
+    completedStudy,
+    completedFd,
+  ] = await Promise.all([
+    getStudySessionCleanedAndErrored(),
+    getFrontDeskCleanedAndErrored(),
+    getStudySessionScholarsInRoom(),
+    getFrontDeskScholarsInRoom(),
+    getStudySessionCompletedSessions(),
+    getFrontDeskCompletedSessions(),
+  ]);
 
   return (
     <div className="container mx-auto max-w-5xl space-y-8 py-12">
@@ -69,7 +79,7 @@ export default async function SessionLogsTestPage() {
       <div>
         <h1 className="text-2xl font-bold">Session Logs Test</h1>
         <p className="text-muted-foreground mt-1">
-          Testing session log utilities against study_session_logs in Supabase.
+          Study session: study_session_logs. Front desk: front_desk_logs table.
         </p>
       </div>
 
@@ -220,7 +230,7 @@ function CleanedErroredSection({
   title,
   formatDate,
 }: {
-  result: Awaited<ReturnType<typeof getStudySessionCleanedAndErrored>>;
+  result: CleanedAndErroredResult;
   title: string;
   formatDate: (iso: string) => string;
 }) {
@@ -239,9 +249,8 @@ function CleanedErroredSection({
           {scholars.map(([uid, { cleaned, errored, scholarName }]) => (
             <li
               key={uid}
-              className={`rounded-md border p-3 text-sm ${
-                errored.length > 0 ? "border-destructive/50" : ""
-              }`}
+              className={`rounded-md border p-3 text-sm ${errored.length > 0 ? "border-destructive/50" : ""
+                }`}
             >
               <div className="font-medium">
                 {scholarName ?? uid}
