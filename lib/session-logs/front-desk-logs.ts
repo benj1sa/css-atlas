@@ -35,9 +35,9 @@ function toSessionLogRow(row: FrontDeskLogRow): SessionLogRow {
     created_at: row.created_at,
     scholar_uid: row.scholar_uid,
     action_type: row.action_type,
-    rep_name: row.rep_name,
+    rep_name: row.rep_name ?? null,
     session_type: row.session_type ?? SESSION_TYPE_FRONT_DESK,
-    submitted_by_email: row.submitted_by_email,
+    submitted_by_email: row.submitted_by_email ?? null,
   };
 }
 
@@ -51,9 +51,11 @@ export async function fetchFrontDeskLogs(options?: {
   sessionType?: SessionType | string;
 }): Promise<SessionLogRow[]> {
   const supabase = await createClient();
+  // Select only columns that exist on front_desk_logs (42703 = undefined_column).
+  // If your table has rep_name, session_type, submitted_by_email, add them to the select.
   let query = supabase
     .from("front_desk_logs")
-    .select("id, created_at, rep_name, scholar_uid, action_type, session_type, submitted_by_email")
+    .select("id, created_at, scholar_uid, action_type")
     .order("created_at", { ascending: true });
 
   if (options?.startDate) {
@@ -62,9 +64,7 @@ export async function fetchFrontDeskLogs(options?: {
   if (options?.endDate) {
     query = query.lte("created_at", options.endDate.toISOString());
   }
-  if (options?.sessionType) {
-    query = query.eq("session_type", options.sessionType);
-  }
+  // If front_desk_logs has session_type, add: if (options?.sessionType) query = query.eq("session_type", options.sessionType);
 
   const { data, error } = await query;
   if (error) throw error;
