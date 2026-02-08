@@ -93,12 +93,6 @@ export default async function SessionLogsTestPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <SessionTypeSection
-            title="All"
-            data={inRoomAll}
-            formatDuration={formatDuration}
-            formatDate={formatDate}
-          />
-          <SessionTypeSection
             title={SESSION_TYPE_STUDY}
             data={inRoomStudy}
             formatDuration={formatDuration}
@@ -122,13 +116,6 @@ export default async function SessionLogsTestPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <SessionTypeSection
-            title="All"
-            data={completedAll}
-            formatDuration={formatDuration}
-            formatDate={formatDate}
-            showCompleted
-          />
           <SessionTypeSection
             title={SESSION_TYPE_STUDY}
             data={completedStudy}
@@ -156,7 +143,6 @@ export default async function SessionLogsTestPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <CleanedErroredSection result={cleanedAll} title="All" formatDate={formatDate} />
           <CleanedErroredSection
             result={cleanedStudy}
             title={SESSION_TYPE_STUDY}
