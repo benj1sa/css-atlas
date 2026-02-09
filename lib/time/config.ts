@@ -22,6 +22,16 @@
  *      treated as a single "campus week" for data collection (winter break can
  *      be 4–5 real weeks but counts as one).
  *
+ * 4. WEEKS_IGNORE_FORMS
+ *    - Campus week numbers to exclude from form-related percentage calculations.
+ *    - Use when developers are asked to disregard form data collection for certain
+ *      weeks (e.g. impromptu exclusions). Leave empty [] if none.
+ *
+ * 5. WEEKS_IGNORE_SESSIONS
+ *    - Campus week numbers to exclude from session-related percentage calculations.
+ *    - Use when developers are asked to disregard session data collection for
+ *      certain weeks (e.g. impromptu exclusions). Leave empty [] if none.
+ *
  * RULES
  * -----
  * - Monday is the first day of the week. Each campus week runs Monday–Sunday (UTC).
@@ -30,6 +40,9 @@
  * - The entire winter break span is one campus week (one week number).
  * - Spring weeks resume on the first Monday on or after the day after WINTER_BREAK_LAST_DAY,
  *   and continue with consecutive Monday–Sunday weeks.
+ * - For percentage calculations (e.g. compliance, completion rates): exclude any week
+ *   whose number is in WEEKS_IGNORE_FORMS when computing form-based percentages, and
+ *   exclude any week in WEEKS_IGNORE_SESSIONS when computing session-based percentages.
  *
  * Example (2024–25):
  *   Fall starts Aug 26 → weeks 1–16 (or so).
@@ -40,3 +53,9 @@
 export const FALL_SEMESTER_FIRST_DAY = "2025-09-01";
 export const WINTER_BREAK_FIRST_DAY = "2025-12-16";
 export const WINTER_BREAK_LAST_DAY = "2026-01-28";
+
+/** Campus week numbers to exclude from form-related percentage calculations. */
+export const WEEKS_IGNORE_FORMS: number[] = [];
+
+/** Campus week numbers to exclude from session-related percentage calculations. */
+export const WEEKS_IGNORE_SESSIONS: number[] = [];
