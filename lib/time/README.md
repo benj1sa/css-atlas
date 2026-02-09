@@ -1,6 +1,6 @@
 # Campus time (lib/time)
 
-This module defines **campus week** semantics: **Monday is the first day of the week** (each week runs Monday–Sunday in UTC). Weeks are numbered from the week that contains the fall semester start and continue through spring, with the entire **winter break** (4–5 calendar weeks) counted as **one** campus week for data collection.
+This module defines **campus week** semantics: **Monday is the first day of the week** (each week runs Monday–Sunday in Eastern time, America/New_York). All date arithmetic and week boundaries are calculated in Eastern. Weeks are numbered from the week that contains the fall semester start and continue through spring, with the entire **winter break** (4–5 calendar weeks) counted as **one** campus week for data collection.
 
 ## What to update each year
 
@@ -20,7 +20,7 @@ See the comments in `config.ts` for exact format and rules. No other files in `l
 - **`campusWeekToDateRange(weekNumber)`** — get `{ startDate, endDate }` for a campus week (for querying logs by week)
 - **`dateToCampusWeek(date)`** — get the campus week number for a given date (for bucketing or reporting)
 
-All dates are interpreted in UTC (e.g. `created_at` from Supabase).
+All dates are interpreted in Eastern time (America/New_York). Database `created_at` values (typically UTC) are converted to Eastern for week bucketing.
 
 ## Example: pull data for a campus week
 

@@ -10,6 +10,7 @@ export {
   CAMPUS_WEEK,
   campusWeekToDateRange,
   dateToCampusWeek,
+  EASTERN_TIMEZONE,
   WINTER_BREAK_CAMPUS_WEEK_NUMBER,
 } from "./campus-week";
 export type { CampusWeekDateRange } from "./campus-week";

@@ -34,7 +34,7 @@
  *
  * RULES
  * -----
- * - Monday is the first day of the week. Each campus week runs Monday–Sunday (UTC).
+ * - Monday is the first day of the week. Each campus week runs Monday–Sunday (Eastern, America/New_York).
  * - Week 1 is the Monday–Sunday week that contains FALL_SEMESTER_FIRST_DAY.
  * - Fall weeks count 1, 2, 3, ... (each Monday–Sunday) up to the week before winter break.
  * - The entire winter break span is one campus week (one week number).
