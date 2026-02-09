@@ -5,17 +5,14 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-// Example onClick function submitting timestamp, uid, and trafficType
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
 export default function TrafficPage() {
   const [uid, setUid] = useState("")
   const [error, setError] = useState("")
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY as string
-  const supabase = createClient(supabaseUrl, supabaseKey)
+  const supabase = createClient()
 
   const validateUid = (): boolean => {
     if (!uid || uid.length !== 9 || !/^\d{9}$/.test(uid)) {
