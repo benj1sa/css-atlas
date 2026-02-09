@@ -4,38 +4,97 @@ import {
   WINTER_BREAK_LAST_DAY,
 } from "./config";
 
-/** Parse "YYYY-MM-DD" as UTC midnight */
-function parseUtcDate(s: string): Date {
-  const d = new Date(s + "T00:00:00.000Z");
-  if (Number.isNaN(d.getTime())) throw new Error(`Invalid date string: ${s}`);
-  return d;
-}
-
-const SEMESTER_START = parseUtcDate(FALL_SEMESTER_FIRST_DAY);
-const WINTER_START = parseUtcDate(WINTER_BREAK_FIRST_DAY);
-const WINTER_END = parseUtcDate(WINTER_BREAK_LAST_DAY);
+export const EASTERN_TIMEZONE = "America/New_York";
 
 /** One day in ms */
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
-/** Monday = 1 in getUTCDay(); days back to reach Monday from a given UTC day */
-function daysBackToMonday(d: Date): number {
-  return (d.getUTCDay() + 6) % 7;
+/**
+ * Parse "YYYY-MM-DD" as midnight Eastern (start of that calendar day in America/New_York).
+ * Handles EST/EDT automatically.
+ */
+function parseEasternDate(s: string): Date {
+  const [y, m, d] = s.split("-").map(Number);
+  if (!y || !m || !d) throw new Error(`Invalid date string: ${s}`);
+  const utcNoon = new Date(Date.UTC(y, m - 1, d, 12, 0, 0, 0));
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: EASTERN_TIMEZONE,
+    hour: "numeric",
+    hour12: false,
+    minute: "numeric",
+    second: "numeric",
+  });
+  const parts = formatter.formatToParts(utcNoon);
+  const hour = parseInt(parts.find((p) => p.type === "hour")?.value ?? "0", 10);
+  const minute = parseInt(parts.find((p) => p.type === "minute")?.value ?? "0", 10);
+  const second = parseInt(parts.find((p) => p.type === "second")?.value ?? "0", 10);
+  const easternMsSinceMidnight = (hour * 3600 + minute * 60 + second) * 1000;
+  const d2 = new Date(utcNoon.getTime() - easternMsSinceMidnight);
+  if (Number.isNaN(d2.getTime())) throw new Error(`Invalid date string: ${s}`);
+  return d2;
 }
 
-/** Monday of the week containing the given date (UTC midnight). */
-function getMondayOfWeek(d: Date): Date {
-  const back = daysBackToMonday(d);
-  return new Date(d.getTime() - back * ONE_DAY_MS);
+const SEMESTER_START = parseEasternDate(FALL_SEMESTER_FIRST_DAY);
+const WINTER_START = parseEasternDate(WINTER_BREAK_FIRST_DAY);
+const WINTER_END = parseEasternDate(WINTER_BREAK_LAST_DAY);
+
+/**
+ * Get day of week in Eastern (0=Sun, 1=Mon, ..., 6=Sat).
+ */
+function getEasternDayOfWeek(d: Date): number {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: EASTERN_TIMEZONE,
+    weekday: "short",
+  });
+  const day = formatter.format(d);
+  const map: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+  };
+  return map[day] ?? 0;
 }
 
-/** Week 1 = Monday–Sunday week that contains FALL_SEMESTER_FIRST_DAY */
-const WEEK_1_MONDAY = getMondayOfWeek(SEMESTER_START);
+/** Truncate a Date to its Eastern calendar day (midnight Eastern). */
+function toEasternDay(d: Date): Date {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: EASTERN_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const parts = formatter.formatToParts(d);
+  const year = parseInt(parts.find((p) => p.type === "year")?.value ?? "0", 10);
+  const month = parseInt(parts.find((p) => p.type === "month")?.value ?? "1", 10) - 1;
+  const day = parseInt(parts.find((p) => p.type === "day")?.value ?? "1", 10);
+  return parseEasternDate(
+    `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+  );
+}
 
-/** First Monday on or after the day after winter break (start of first spring week) */
+/** Days back to reach Monday from a given Eastern day (Monday=1). */
+function daysBackToMondayEastern(d: Date): number {
+  return (getEasternDayOfWeek(d) + 6) % 7;
+}
+
+/** Monday midnight Eastern of the week containing the given date (interpreted in Eastern). */
+function getMondayOfWeekEastern(d: Date): Date {
+  const easternDay = toEasternDay(d);
+  const back = daysBackToMondayEastern(easternDay);
+  return new Date(easternDay.getTime() - back * ONE_DAY_MS);
+}
+
+/** Week 1 = Monday–Sunday week (Eastern) that contains FALL_SEMESTER_FIRST_DAY */
+const WEEK_1_MONDAY = getMondayOfWeekEastern(SEMESTER_START);
+
+/** First Monday on or after the day after winter break (Eastern; start of first spring week) */
 const FIRST_SPRING_MONDAY = (() => {
   const dayAfterBreak = new Date(WINTER_END.getTime() + ONE_DAY_MS);
-  const dayOfWeek = dayAfterBreak.getUTCDay();
+  const dayOfWeek = getEasternDayOfWeek(dayAfterBreak);
   const daysUntilMonday = dayOfWeek === 1 ? 0 : (8 - dayOfWeek) % 7;
   return new Date(dayAfterBreak.getTime() + daysUntilMonday * ONE_DAY_MS);
 })();
@@ -48,12 +107,6 @@ export const WINTER_BREAK_CAMPUS_WEEK_NUMBER = (() => {
   );
   return Math.floor(daysFromWeek1 / 7) + 2;
 })();
-
-/** Truncate a Date to UTC calendar day (midnight UTC) */
-function toUtcDay(d: Date): Date {
-  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-  return t;
-}
 
 /**
  * Constants describing campus week behavior for use in data queries.
@@ -79,9 +132,9 @@ export const CAMPUS_WEEK = {
 export type CampusWeekDateRange = {
   /** Campus week number (1-based, winter break is one number) */
   weekNumber: number;
-  /** Start of the week (inclusive), UTC midnight */
+  /** Start of the week (inclusive), midnight Eastern */
   startDate: Date;
-  /** End of the week (inclusive), UTC midnight */
+  /** End of the week (inclusive), midnight Eastern of last day */
   endDate: Date;
 };
 
@@ -131,11 +184,11 @@ export function campusWeekToDateRange(weekNumber: number): CampusWeekDateRange |
  * - Spring: week = winter break week + 1 + weeks from first spring Monday (dates before
  *   that Monday fall in the first spring week).
  *
- * @param date - Any Date (typically created_at from DB); UTC date part is used
+ * @param date - Any Date (typically created_at from DB); interpreted in Eastern time
  * @returns Campus week number (1-based) or null if before week 1
  */
 export function dateToCampusWeek(date: Date): number | null {
-  const d = toUtcDay(date);
+  const d = toEasternDay(date);
   const t = d.getTime();
 
   if (t < WEEK_1_MONDAY.getTime()) return null;
