@@ -1,3 +1,5 @@
+import { IdleResetProvider } from "@/components/idle-reset-provider";
+
 /**
  * Traffic route layout.
  * This layout wraps all pages under the /traffic route.
@@ -7,5 +9,9 @@ export default function TrafficLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <IdleResetProvider>
+      {children}
+    </IdleResetProvider>
+  );
 }
