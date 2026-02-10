@@ -47,7 +47,9 @@ export default function TrafficPage() {
           toast.error("Failed to submit entry");
         } else {
           console.log(data);
-          toast.success("Entry submitted successfully");
+          toast.success("Entry submitted successfully", {
+            className: "bg-green-500 text-white border-green-600",
+          });
           setUid("");
           setError("");
         }
@@ -77,7 +79,9 @@ export default function TrafficPage() {
           toast.error("Failed to submit exit");
         } else {
           console.log(data);
-          toast.success("Exit submitted successfully");
+          toast.success("Exit submitted successfully", {
+            className: "bg-green-500 text-white border-green-600",
+          });
           setUid("");
           setError("");
         }
